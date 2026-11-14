@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solaratlas Pilot · Photovoltaik vor Ort</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='6' fill='%23256abf'/></svg>">
+  <link rel="stylesheet" href="vendor/maplibre-gl.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="fixture-banner" hidden>Testdaten: Diese Ansicht zeigt synthetische Daten aus der Testumgebung, keine echten Werte.</div>
+
+  <header class="top">
+    <div>
+      <h1>Solaratlas Pilot</h1>
+      <p class="sub">Photovoltaik vor Ort: alle 16 Bundesländer, Pilotregion <span id="pilot-name">Brandenburg</span> bis auf Gemeindeebene</p>
+    </div>
+    <dl class="kpis" id="kpis"></dl>
+  </header>
+
+  <nav class="controls" aria-label="Ansicht wählen">
+    <div class="seg" role="radiogroup" aria-label="Ebene" id="level-switch"></div>
+    <label class="select">
+      <span>Kennzahl</span>
+      <select id="indicator"></select>
+    </label>
+    <a id="csv" class="link" href="#" download>Daten als CSV</a>
+  </nav>
+
+  <main class="layout">
+    <section class="map-wrap" aria-label="Karte">
+      <div id="map"></div>
+      <div id="legend" class="legend" aria-label="Legende"></div>
+      <div id="tooltip" class="tooltip" role="status" hidden></div>
+    </section>
+    <section class="rank" aria-label="Rangfolge">
+      <h2 id="rank-title">Rangfolge</h2>
+      <p class="hint" id="rank-hint"></p>
+      <div id="chart" class="chart"></div>
+    </section>
+  </main>
+
+  <section class="panel" aria-labelledby="qa-title">
+    <div class="panel-head">
+      <h2 id="qa-title">Datenqualität</h2>
+      <p class="hint">Diese Prüfungen laufen bei jeder automatischen Aktualisierung. Schlägt eine Fehlerprüfung fehl, wird nichts veröffentlicht und die vorherige Version bleibt online.</p>
+    </div>
+    <ul id="checks" class="checks"></ul>
+  </section>
+
+  <footer class="panel foot">
+    <h2>Quellen und Methode</h2>
+    <ul id="sources" class="sources"></ul>
+    <p class="hint" id="method"></p>
+    <p class="hint">Code und Dokumentation: <a id="repo-link" href="#">Repository</a>. Karten mit MapLibre GL JS, Diagramme mit D3.</p>
+  </footer>
+
+  <script src="vendor/d3.min.js"></script>
+  <script src="vendor/maplibre-gl.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
