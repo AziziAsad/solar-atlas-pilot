@@ -52,6 +52,6 @@ def test_implausible_national_population_is_warned(meta):
 
 
 def test_layers_exported(meta):
-    assert meta["layers"] == {"laender": 16, "pilot_kreise": 6, "pilot_gemeinden": 24}
+    assert meta["layers"] == {"laender": 16, "kreise": 36, "pilot_kreise": 6, "pilot_gemeinden": 24}
     fc = json.loads((config.WEB_DATA_DIR / "laender.geojson").read_text())
     assert all("pv_w_per_capita" in f["properties"] for f in fc["features"])

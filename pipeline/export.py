@@ -11,6 +11,7 @@ log = logging.getLogger(__name__)
 # name -> (level, restrict to pilot Land?, simplification tolerance in metres)
 LAYERS = {
     "laender": ("land", False, 400),
+    "kreise": ("kreis", False, 250),
     "pilot_kreise": ("kreis", True, 120),
     "pilot_gemeinden": ("gemeinde", True, 60),
 }

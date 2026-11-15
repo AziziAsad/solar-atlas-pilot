@@ -4,7 +4,7 @@
 
 **Live map: https://aziziasad.github.io/solar-atlas-pilot/**
 
-The pilot maps rooftop and ground-mounted solar power in Germany: for all 16 Länder, and for one pilot region (Brandenburg) down to Kreis and Gemeinde level. Every week a GitHub Actions workflow downloads the latest official data, rebuilds a PostGIS database, runs a set of quality checks and republishes the map. If an error-level check fails, nothing is published and the previous version stays online.
+The pilot maps rooftop and ground-mounted solar power in Germany: for all 16 Länder and all 400 Kreise, and for one pilot region (Brandenburg) down to Gemeinde level. Every week a GitHub Actions workflow downloads the latest official data, rebuilds a PostGIS database, runs a set of quality checks and republishes the map. If an error-level check fails, nothing is published and the previous version stays online.
 
 Solar is the test subject, not the point. The point is the foundation underneath: a data model that extends to every spatial level and to new themes without restructuring, and a pipeline that proves its numbers are right before anyone sees them.
 
@@ -98,7 +98,7 @@ Settings (pilot region, thresholds, source overrides) are in `pipeline/config.py
 
 ## From pilot to full atlas
 
-* **All Kreise and Gemeinden.** The data is already computed for all of Germany; only the export restricts detail to the pilot region. Nationwide Gemeinde maps (about 10,800 areas) need vector tiles instead of GeoJSON, for example with PMTiles generated in the same workflow.
+* **All Gemeinden.** The data is already computed for all of Germany; Länder and Kreise are published nationwide, and only the Gemeinde layer is restricted to the pilot region. Nationwide Gemeinde maps (about 10,800 areas) need vector tiles instead of GeoJSON, for example with PMTiles generated in the same workflow.
 * **More sources.** Destatis and Regionalstatistik (GENESIS API), Bundesagentur für Arbeit and Zensus 2022 fit the same pattern: a connector in `pipeline/sources/`, a staging table in `raw`, indicator rows in `core`. Their suppressed cells map directly to `status = 'missing'`.
 * **Territorial harmonisation.** For time series across reforms, convert older Gemeinde codes with the Destatis change keys before joining, so all periods sit on one territorial status.
 * **AI-assisted checks, where they help.** A language model can read source release notes and footnotes and flag definition changes, and draft a plain-language explanation of each flagged anomaly for a person to review. It should not correct data on its own.

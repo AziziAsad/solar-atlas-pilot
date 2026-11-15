@@ -5,6 +5,7 @@ const RAMP = ["#cde2fb", "#86b6ef", "#3987e5", "#1c5cab", "#0d366b"]; // sequent
 const NODATA = "#e6e4df";
 const VIEWS = {
   laender: { label: "Bundesländer", outline: null },
+  kreise: { label: "Kreise", outline: "laender" },
   pilot_kreise: { label: "Kreise", outline: "laender" },
   pilot_gemeinden: { label: "Gemeinden", outline: "pilot_kreise" },
 };
@@ -79,7 +80,7 @@ function initMap() {
         layout: { visibility: "none" }, paint: { "fill-color": NODATA } });
       map.addLayer({ id: `${k}-line`, type: "line", source: k,
         layout: { visibility: "none" },
-        paint: { "line-color": "#fcfcfb", "line-width": k === "pilot_gemeinden" ? 0.5 : 1 } });
+        paint: { "line-color": "#fcfcfb", "line-width": k === "laender" || k === "pilot_kreise" ? 1 : 0.5 } });
     }
     for (const k of Object.keys(VIEWS)) {
       map.addLayer({ id: `${k}-context`, type: "line", source: k,
@@ -90,9 +91,7 @@ function initMap() {
                  "line-width": ["case", ["boolean", ["feature-state", "hover"], false], 2.5, 0] } });
       map.on("mousemove", `${k}-fill`, e => k === state.view && setHover(e.features[0].properties.ags, e.point));
       map.on("mouseleave", `${k}-fill`, () => k === state.view && setHover(null));
-      map.on("click", `${k}-fill`, e => {
-        if (k === "laender" && e.features[0].properties.ags === meta.pilot_land.ags) setView("pilot_kreise");
-      });
+      map.on("click", `${k}-fill`, e => k === state.view && drillDown(e.features[0].properties.ags));
     }
     render(true);
   });
@@ -150,9 +149,7 @@ function renderChart(c) {
     .text(d => fmt(d.properties[state.indicator], i.decimals));
   g.on("mouseenter", (e, d) => setHover(d.properties.ags))
    .on("mouseleave", () => setHover(null))
-   .on("click", (e, d) => {
-     if (state.view === "laender" && d.properties.ags === meta.pilot_land.ags) setView("pilot_kreise");
-   });
+   .on("click", (e, d) => drillDown(d.properties.ags));
 }
 
 /* ---------- legend, controls, panels ---------- */
@@ -167,6 +164,12 @@ function renderLegend(c) {
 }
 
 function setView(v) { state.view = v; setHover(null); render(true); }
+
+/* Click on Brandenburg (Länder view) or on a Brandenburg Kreis (Germany view) opens the pilot region. */
+function drillDown(ags) {
+  if (state.view === "laender" && ags === meta.pilot_land.ags) setView("pilot_kreise");
+  else if (state.view === "kreise" && ags.startsWith(meta.pilot_land.ags)) setView("pilot_gemeinden");
+}
 
 function render(fit) {
   const c = classes();
@@ -186,10 +189,14 @@ function render(fit) {
   document.querySelectorAll("#level-switch button").forEach(b =>
     b.setAttribute("aria-checked", String(b.dataset.view === state.view)));
   const i = ind(state.indicator);
-  const where = state.view === "laender" ? "Bundesländer" : `${VIEWS[state.view].label} in ${meta.pilot_land.name}`;
+  const where = state.view === "laender" ? "Bundesländer"
+    : state.view === "kreise" ? "Kreise in Deutschland"
+    : `${VIEWS[state.view].label} in ${meta.pilot_land.name}`;
   $("#rank-title").textContent = `${i.name_de}: ${where}`;
   $("#rank-hint").textContent = state.view === "laender"
     ? `${i.description_de}. Klick auf ${meta.pilot_land.name} öffnet die Pilotregion.`
+    : state.view === "kreise"
+    ? `${i.description_de}. Klick auf einen Kreis in ${meta.pilot_land.name} öffnet die Gemeinden.`
     : `${i.description_de}.`;
   renderLegend(c);
   renderChart(c);
@@ -202,7 +209,8 @@ function buildControls() {
   for (const [k, v] of Object.entries(VIEWS)) {
     const b = document.createElement("button");
     b.type = "button"; b.dataset.view = k; b.setAttribute("role", "radio");
-    b.textContent = k === "laender" ? v.label : `${meta.pilot_land.name}: ${v.label}`;
+    b.textContent = k === "laender" ? v.label
+      : k === "kreise" ? `Deutschland: ${v.label}` : `${meta.pilot_land.name}: ${v.label}`;
     b.onclick = () => setView(k);
     sw.appendChild(b);
   }

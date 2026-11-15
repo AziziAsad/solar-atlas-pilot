@@ -39,7 +39,9 @@ def discover_url() -> str:
             "No Gesamtdatenexport link found on the MaStR download page. "
             "Set MASTR_URL to the zip URL to continue."
         )
-    url = sorted(set(hits))[-1]  # newest export date sorts last
+    def key(u):
+        return (re.search(r"Gesamtdatenexport_(\d{8})", u).group(1), "stichtag" not in u.lower())
+    url = max(set(hits), key=key)  # newest export date; daily export over Stichtag on ties
     log.info("MaStR source: %s", url)
     return url
 
